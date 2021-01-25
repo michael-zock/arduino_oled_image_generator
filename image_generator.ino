@@ -1,7 +1,7 @@
-#include <SPI.h>
-#include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+#include <SPI.h>
+#include <Wire.h>
 
 const uint8_t display_width = 128;
 const uint8_t display_height = 32;
@@ -19,19 +19,16 @@ const uint8_t bitmap[] PROGMEM = {
     0x03, 0x0f, 0xf0, 0xc0, 0x01, 0x81, 0x81, 0x80, 0x00, 0xc1, 0x83, 0x00, 0x00, 0x79, 0x9e, 0x00,
     0x00, 0x0f, 0xf0, 0x00, 0x00, 0x01, 0x80, 0x00, 0x00, 0x01, 0x80, 0x00, 0x00, 0x01, 0x80, 0x00};
 
-void setup()
-{
+void setup() {
   Serial.begin(9600);
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
   delay(100);
   display.clearDisplay();
 }
 
-void loop()
-{
+void loop() {
 
-  for (int i = 0; i < 32; i++)
-  {
+  for (int i = 0; i < 32; i++) {
     drawWhiteNoise();
   }
 
@@ -40,8 +37,7 @@ void loop()
   drawRandomGraph();
   drawRandomText();
 
-  for (uint16_t angle = 0; angle < 360; angle += 6)
-  {
+  for (uint16_t angle = 0; angle < 360; angle += 6) {
     display.clearDisplay();
     drawRotatedBitmap((display_width - 32) * 0.1, 0, bitmap, 32, 32, WHITE, angle);
     drawRotatedBitmap((display_width - 32) * 0.5, 0, bitmap, 32, 32, WHITE, angle);
@@ -49,51 +45,43 @@ void loop()
     display.display(); //sends the buffer to the OLED
   }
 
-  for (int i = 0; i < 32; i++)
-  {
+  for (int i = 0; i < 32; i++) {
     drawHorizontalGauge(0, 0, display_width / 2, display_height, WHITE, WHITE, random(10, 90));
     drawVerticalGauge(display_width / 2, 0, display_width / 2, display_height, WHITE, WHITE, random(10, 90));
     delay(10);
   }
 }
 
-void drawWhiteNoise()
-{
+void drawWhiteNoise() {
   uint8_t *p = display.getBuffer();
-  for (int i = 0; i < display_buffer_size; i++)
-  {
+  for (int i = 0; i < display_buffer_size; i++) {
     p[i] = random(0, 255); //write 8-pixels direct to buffer
   }
   drawBorder();
   display.display(); //sends the buffer to the OLED
 }
 
-void drawBorder()
-{
+void drawBorder() {
   display.drawRect(0, 0, display_width, display_height, WHITE);
 }
 
-void drawGrid()
-{
+void drawGrid() {
   drawBorder();
 
   display.drawLine(display_width * 0.50, 0, display_width * 0.50, display_height, WHITE);
-  if (display_width > display_height)
-  {
+  if (display_width > display_height) {
     display.drawLine(display_width * 0.25, 0, display_width * 0.25, display_height, WHITE);
     display.drawLine(display_width * 0.75, 0, display_width * 0.75, display_height, WHITE);
   }
 
   display.drawLine(0, display_height * 0.50, display_width, display_height * 0.50, WHITE);
-  if (display_height > display_width)
-  {
+  if (display_height > display_width) {
     display.drawLine(0, display_height * 0.25, display_width, display_height * 0.25, WHITE);
     display.drawLine(0, display_height * 0.75, display_width, display_height * 0.75, WHITE);
   }
 }
 
-void drawRandomWaves()
-{
+void drawRandomWaves() {
   int old_x, old_cos, old_sin, new_cos, new_sin, vCenter = display_height / 2;
   uint8_t Radius = random(display_height / 16, display_height / 2);
   float offset = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 4));
@@ -101,19 +89,15 @@ void drawRandomWaves()
   display.clearDisplay();
   drawGrid();
 
-  for (int new_x = 0; new_x < display_width; new_x++)
-  {
+  for (int new_x = 0; new_x < display_width; new_x++) {
     float angle = (new_x * 3) * offset;
     new_cos = (vCenter + (sin(angle * (M_PI / 180)) * Radius) * offset);
     new_sin = (vCenter + (cos(angle * (M_PI / 180)) * Radius) * offset);
 
-    if (new_x == 0)
-    {
+    if (new_x == 0) {
       display.drawPixel(new_x, new_cos, WHITE);
       display.drawPixel(new_x, new_sin, WHITE);
-    }
-    else
-    {
+    } else {
       display.drawLine(old_x, old_cos, new_x, new_cos, WHITE);
       display.drawLine(old_x, old_sin, new_x, new_sin, WHITE);
     }
@@ -126,23 +110,20 @@ void drawRandomWaves()
   }
 }
 
-void drawRandomWaveform()
-{
+void drawRandomWaveform() {
   uint8_t vCenter = display_height / 2;
   display.clearDisplay();
 
   drawGrid();
 
-  for (int i = 0; i < display_width; i++)
-  {
+  for (int i = 0; i < display_width; i++) {
     uint8_t val = random(0, vCenter);
     display.drawLine(i, vCenter - val, i, vCenter + val, WHITE);
     display.display(); //sends the buffer to the OLED
   }
 }
 
-void drawRandomGraph()
-{
+void drawRandomGraph() {
 
   uint8_t prev_x = 0;
   uint8_t prev_val = 0;
@@ -150,38 +131,30 @@ void drawRandomGraph()
 
   drawGrid();
 
-  for (int i = 0; i < display_width; i++)
-  {
+  for (int i = 0; i < display_width; i++) {
     uint8_t val = random(0, display_height);
-    if (i == 0 || i == display_width || (random(0, 64) % 4 == 0))
-    {
+    if (i == 0 || i == display_width || (random(0, 64) % 4 == 0)) {
       display.drawLine(prev_x, prev_val, i, val, WHITE);
       prev_x = i;
       prev_val = val;
-    }
-    else
-    {
+    } else {
       delay(5);
     }
     display.display(); //sends the buffer to the OLED
   }
 }
 
-void drawRandomText()
-{
+void drawRandomText() {
   uint8_t border = 3;
   display.clearDisplay();
   drawBorder();
 
-  for (int y = border; y < (display_height - border); y = (y + random(1, 3)))
-  {
-    if ((random(1, 15) % 4) == 0)
-    {
+  for (int y = border; y < (display_height - border); y = (y + random(1, 3))) {
+    if ((random(1, 15) % 4) == 0) {
       continue;
     }
 
-    for (int x = border; x < display_width - border - random(1, (display_width / 4)); x++)
-    {
+    for (int x = border; x < display_width - border - random(1, (display_width / 4)); x++) {
       int x_end = x + random(2, 16);
       display.drawLine(x, y, x_end, y, WHITE);
       x = x_end + 1;
@@ -190,26 +163,21 @@ void drawRandomText()
   }
 }
 
-void drawRotatedBitmap(uint8_t x, uint8_t y, const uint8_t *bitmap, uint8_t width, uint8_t height, uint8_t color, int angle)
-{
+void drawRotatedBitmap(uint8_t x, uint8_t y, const uint8_t *bitmap, uint8_t width, uint8_t height, uint8_t color, int angle) {
   int8_t old_x, old_y, new_x, new_y; // old and new (rotated) Pixel-Coordinates
   uint8_t pivot_x = width / 2;       // Calculate the (rotation) center of the image (x fraction)
   uint8_t pivot_y = height / 2;      // Calculate the (rotation) center of the image (y fraction)
   float angle_rad = angle / 57.3;
   float sin_angle = sin(angle_rad); // Lookup the sinus
   float cos_angle = cos(angle_rad); // Lookup the cosinus
-  for (int row = 0; row < height; row++)
-  {
+  for (int row = 0; row < height; row++) {
     uint8_t displayData, mask = 0;
-    for (int col = 0; col < width; col++)
-    {
-      if (mask == 0)
-      {
+    for (int col = 0; col < width; col++) {
+      if (mask == 0) {
         displayData = pgm_read_byte(bitmap++); // Read the image data from PROGMEM
         mask = 0x80;                           // MSB first
       }
-      if (displayData & mask)
-      {                                                       // i.e. a pixel
+      if (displayData & mask) {                               // i.e. a pixel
         old_x = col - pivot_x;                                // Calculate the x-position of the Pixel to be rotated
         old_y = row - pivot_y;                                // Calculate the y-position of the Pixel to be rotated
         new_x = (int)(old_x * cos_angle - old_y * sin_angle); // Calculate the x-position of the rotated pixel
@@ -221,8 +189,7 @@ void drawRotatedBitmap(uint8_t x, uint8_t y, const uint8_t *bitmap, uint8_t widt
   }
 }
 
-void drawHorizontalGauge(uint16_t x0, uint16_t y0, uint16_t width, uint16_t height, uint16_t color_frame, uint16_t color_fill, float percentage)
-{
+void drawHorizontalGauge(uint16_t x0, uint16_t y0, uint16_t width, uint16_t height, uint16_t color_frame, uint16_t color_fill, float percentage) {
   uint16_t width_filled = map(percentage, 0, 100, 0, width);
   display.fillRect(x0, y0, width, height, BLACK);
   display.fillRect(x0, y0, width_filled, height, color_fill);
@@ -230,8 +197,7 @@ void drawHorizontalGauge(uint16_t x0, uint16_t y0, uint16_t width, uint16_t heig
   display.display(); //sends the buffer to the OLED
 }
 
-void drawVerticalGauge(uint16_t x0, uint16_t y0, uint16_t width, uint16_t height, uint16_t color_frame, uint16_t color_fill, float percentage)
-{
+void drawVerticalGauge(uint16_t x0, uint16_t y0, uint16_t width, uint16_t height, uint16_t color_frame, uint16_t color_fill, float percentage) {
   uint16_t height_filled = map(percentage, 0, 100, 0, height);
   display.fillRect(x0, y0, width, height, BLACK);
   display.fillRect(x0, y0, width, height_filled, color_fill);
