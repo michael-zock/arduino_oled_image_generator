@@ -27,8 +27,7 @@ void setup() {
 }
 
 void loop() {
-
-  for (int i = 0; i < 32; i++) {
+  for (int i = 0; i < 25; i++) {
     drawWhiteNoise();
   }
 
@@ -46,9 +45,21 @@ void loop() {
   }
 
   for (int i = 0; i < 32; i++) {
-    drawHorizontalGauge(0, 0, display_width / 2, display_height, WHITE, WHITE, random(10, 90));
-    drawVerticalGauge(display_width / 2, 0, display_width / 2, display_height, WHITE, WHITE, random(10, 90));
+    drawHorizontalBarGauge(0, 0, display_width / 2, display_height, WHITE, WHITE, random(10, 90));
+    drawVerticalBarGauge(display_width / 2, 0, display_width / 2, display_height, WHITE, WHITE, random(10, 90));
     delay(10);
+  }
+
+  for (int i = 0; i < 25; i++) {
+    drawHorizontalTriangleGauge(0, 0, display_width / 2, display_height, WHITE, WHITE, random(10, 90));
+    drawVerticalTriangleGauge(display_width / 2, 0, display_width / 2, display_height, WHITE, WHITE, random(10, 90));
+    delay(10);
+  }
+
+  for (int i = 0; i < 25; i++) {
+    display.clearDisplay();
+    drawHorizontalTriangleGauge(0, 0, display_width / 2, display_height, WHITE, WHITE, random(10, 90));
+    drawVerticalTriangleGauge(display_width / 2, 0, display_width / 2, display_height, WHITE, WHITE, random(10, 90));
   }
 }
 
@@ -189,18 +200,48 @@ void drawRotatedBitmap(uint8_t x, uint8_t y, const uint8_t *bitmap, uint8_t widt
   }
 }
 
-void drawHorizontalGauge(uint16_t x0, uint16_t y0, uint16_t width, uint16_t height, uint16_t color_frame, uint16_t color_fill, float percentage) {
+void drawHorizontalBarGauge(uint16_t x0, uint16_t y0, uint16_t width, uint16_t height, uint16_t color_frame, uint16_t color_fill, float percentage) {
   uint16_t width_filled = map(percentage, 0, 100, 0, width);
-  display.fillRect(x0, y0, width, height, BLACK);
+  display.fillRect(x0, y0, width, height, BLACK); // Reset the display area's background to black
   display.fillRect(x0, y0, width_filled, height, color_fill);
   display.drawRect(x0, y0, width, height, color_frame);
   display.display(); //sends the buffer to the OLED
 }
 
-void drawVerticalGauge(uint16_t x0, uint16_t y0, uint16_t width, uint16_t height, uint16_t color_frame, uint16_t color_fill, float percentage) {
+void drawVerticalBarGauge(uint16_t x0, uint16_t y0, uint16_t width, uint16_t height, uint16_t color_frame, uint16_t color_fill, float percentage) {
   uint16_t height_filled = map(percentage, 0, 100, 0, height);
-  display.fillRect(x0, y0, width, height, BLACK);
-  display.fillRect(x0, y0, width, height_filled, color_fill);
+  display.fillRect(x0, y0, width, height, BLACK); // Reset the display area's background to black
+  display.fillRect(x0, y0 + height - height_filled, width, height_filled, color_fill);
   display.drawRect(x0, y0, width, height, color_frame);
+  display.display(); //sends the buffer to the OLED
+}
+
+void drawHorizontalTriangleGauge(uint16_t x0, uint16_t y0, uint16_t width, uint16_t height, uint16_t color_frame, uint16_t color_fill, float percentage) {
+  uint16_t width_filled = map(percentage, 0, 100, 0, width),
+           x1 = x0,
+           y1 = y0 + height - 1,
+           x2 = x0 + width - 1,
+           y2 = y1;
+
+  display.fillRect(x0, y0, width, height, BLACK); // Reset the display area's background to black
+  display.fillRect(x0, y0, width_filled, height, color_fill);
+  display.drawRect(x0, y0, width, height, color_frame);
+  display.fillTriangle(x0 + 1, y0, x2, y0, x2, y1 - 1, BLACK);
+  display.drawLine(x0, y0, x2, y2, color_frame);
+  display.display(); //sends the buffer to the OLED
+}
+
+void drawVerticalTriangleGauge(uint16_t x0, uint16_t y0, uint16_t width, uint16_t height, uint16_t color_frame, uint16_t color_fill, float percentage) {
+  uint16_t height_filled = map(percentage, 0, 100, 0, height),
+           x1 = x0,
+           y1 = y0 + height - 1,
+           x2 = x0 + width - 1,
+           y2 = y1;
+
+  display.fillRect(x0, y0, width, height, BLACK); // Reset the display area's background to black
+  display.fillRect(x0, y0 + height - height_filled, width, height_filled, color_fill);
+  display.drawRect(x0, y0, width, height, color_frame);
+  display.fillTriangle(x0 + 1, y0, x2, y0, x2, y1 - 1, BLACK);
+  display.drawLine(x0, y0, x2, y2, color_frame);
   display.display(); //sends the buffer to the OLED
 }
