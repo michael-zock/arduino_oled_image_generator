@@ -27,6 +27,7 @@ void setup() {
 }
 
 void loop() {
+
   for (int i = 0; i < 25; i++) {
     drawWhiteNoise();
   }
@@ -60,6 +61,11 @@ void loop() {
     display.clearDisplay();
     drawHorizontalTriangleGauge(0, 0, display_width / 2, display_height, WHITE, WHITE, random(10, 90));
     drawVerticalTriangleGauge(display_width / 2, 0, display_width / 2, display_height, WHITE, WHITE, random(10, 90));
+  }
+
+    for (int i = 0; i < 25; i++) {
+    display.clearDisplay();
+    drawCircularGauge(display_width / 2 - display_height / 2, 0, display_height, display_height, 1, 0, random(10, 90), WHITE);
   }
 }
 
@@ -243,5 +249,44 @@ void drawVerticalTriangleGauge(uint16_t x0, uint16_t y0, uint16_t width, uint16_
   display.drawRect(x0, y0, width, height, color_frame);
   display.fillTriangle(x0 + 1, y0, x2, y0, x2, y1 - 1, BLACK);
   display.drawLine(x0, y0, x2, y2, color_frame);
+  display.display(); //sends the buffer to the OLED
+}
+
+void drawCircularGauge(uint16_t x, uint16_t y, uint16_t width, uint16_t height, int line_width, int start_angle, float percentage, uint16_t color) {
+  int radius_x = width / 2,
+      radius_y = height / 2,
+      x_center = x + radius_x,
+      y_center = y + radius_y;
+  float DEG2RAD = 0.0174532925;
+  byte seg_degrees = 6;
+  int seg_count = map(percentage, 0, 100, 0, 360) / seg_degrees;
+
+  // Calculate first pair of coordinates for segment start
+  float start_x = cos((start_angle - 90) * DEG2RAD);
+  float start_y = sin((start_angle - 90) * DEG2RAD);
+  uint16_t x0 = start_x * (radius_x - line_width) + x_center;
+  uint16_t y0 = start_y * (radius_y - line_width) + y_center;
+  uint16_t x1 = start_x * radius_x + x_center;
+  uint16_t y1 = start_y * radius_y + y_center;
+
+  display.fillRect(x, y, width, height, BLACK); // Reset the display area's background to black
+
+  for (int current_angle = start_angle; current_angle < start_angle + seg_degrees * seg_count; current_angle += seg_degrees) {
+    float start_x2 = cos((current_angle + 1 - 90) * DEG2RAD);
+    float start_y2 = sin((current_angle + 1 - 90) * DEG2RAD);
+    int x2 = start_x2 * (radius_x - line_width) + x_center;
+    int y2 = start_y2 * (radius_y - line_width) + y_center;
+    int x3 = start_x2 * radius_x + x_center;
+    int y3 = start_y2 * radius_y + y_center;
+
+    display.fillTriangle(x0, y0, x1, y1, x2, y2, color);
+    display.fillTriangle(x1, y1, x2, y2, x3, y3, color);
+
+    // Copy segment end to segement start for next segment
+    x0 = x2;
+    y0 = y2;
+    x1 = x3;
+    y1 = y3;
+  }
   display.display(); //sends the buffer to the OLED
 }
