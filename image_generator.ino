@@ -44,33 +44,31 @@ void loop() {
     display.display(); //sends the buffer to the OLED
   }
 
+  display.clearDisplay();
   for (int i = 0; i < 32; i++) {
-    drawHorizontalBarGauge(0, 0, display_width / 2, display_height, WHITE, WHITE, random(10, 90));
-    drawVerticalBarGauge(display_width / 2, 0, display_width / 2, display_height, WHITE, WHITE, random(10, 90));
+    drawHorizontalBarGauge(0, 0, display_width * .75, display_height, WHITE, WHITE, random(10, 90));
+    drawVerticalBarGauge(display_width * .8, 0, display_width * .2, display_height, WHITE, WHITE, random(10, 90));
     delay(10);
   }
 
-  for (int i = 0; i < 25; i++) {
-    drawHorizontalTriangleGauge(0, 0, display_width / 2, display_height, WHITE, WHITE, random(10, 90));
-    drawVerticalTriangleGauge(display_width / 2, 0, display_width / 2, display_height, WHITE, WHITE, random(10, 90));
-    delay(10);
-  }
-
+  display.clearDisplay();
   for (int i = 0; i < 25; i++) {
     display.clearDisplay();
-    drawHorizontalTriangleGauge(0, 0, display_width / 2, display_height, WHITE, WHITE, random(10, 90));
-    drawVerticalTriangleGauge(display_width / 2, 0, display_width / 2, display_height, WHITE, WHITE, random(10, 90));
+    drawHorizontalTriangleGauge(0, 0, display_width * .75, display_height, WHITE, WHITE, random(10, 90));
+    drawVerticalTriangleGauge(display_width * .8, 0, display_width * .2, display_height, WHITE, WHITE, random(10, 90));
   }
 
+  display.clearDisplay();
   for (int i = 0; i < 25; i++) {
-    display.clearDisplay();
     drawCircularGauge(display_width / 2 - display_height / 2, 0, display_height, display_height, 1, 0, random(10, 90), WHITE);
   }
 
+  display.clearDisplay();
   for (int phase = 0; phase < 90; phase++) {
     drawSineWave(0.8, 5, phase);
   }
 
+  display.clearDisplay();
   for (int phase = 0; phase < 90; phase++) {
     drawSquareWave(0.6, 10, phase);
   }
