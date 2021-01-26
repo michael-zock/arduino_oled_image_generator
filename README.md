@@ -1,4 +1,4 @@
-# image_generator
+# arduino_oled_image_generator
 
 Arduino code examples for generating animated/animatable content on an OLED screen.
 
