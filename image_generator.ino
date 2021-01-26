@@ -27,15 +27,14 @@ void setup() {
 }
 
 void loop() {
-
   for (int i = 0; i < 25; i++) {
     drawWhiteNoise();
   }
 
-  drawRandomWaves();
-  drawRandomWaveform();
-  drawRandomGraph();
-  drawRandomText();
+  animateRandomWaves();
+  animateRandomWaveform();
+  animateRandomGraph();
+  animateRandomText();
 
   for (uint16_t angle = 0; angle < 360; angle += 6) {
     display.clearDisplay();
@@ -63,9 +62,17 @@ void loop() {
     drawVerticalTriangleGauge(display_width / 2, 0, display_width / 2, display_height, WHITE, WHITE, random(10, 90));
   }
 
-    for (int i = 0; i < 25; i++) {
+  for (int i = 0; i < 25; i++) {
     display.clearDisplay();
     drawCircularGauge(display_width / 2 - display_height / 2, 0, display_height, display_height, 1, 0, random(10, 90), WHITE);
+  }
+
+  for (int phase = 0; phase < 90; phase++) {
+    drawSineWave(0.8, 5, phase);
+  }
+
+  for (int phase = 0; phase < 90; phase++) {
+    drawSquareWave(0.6, 10, phase);
   }
 }
 
@@ -98,7 +105,7 @@ void drawGrid() {
   }
 }
 
-void drawRandomWaves() {
+void animateRandomWaves() {
   int old_x, old_cos, old_sin, new_cos, new_sin, vCenter = display_height / 2;
   uint8_t Radius = random(display_height / 16, display_height / 2);
   float offset = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 4));
@@ -127,7 +134,66 @@ void drawRandomWaves() {
   }
 }
 
-void drawRandomWaveform() {
+void drawSineWave(float amplitude, float frequency, float phase) {
+  //  amplitude: vertical compression (1 = screen height)
+  //  frequency: horizontal compression (1 = screen width)
+  //  phase: horitontal shift (in degrees)
+
+  int old_x, old_y, new_y;
+  uint8_t vCenter = display_height / 2;
+
+  display.clearDisplay();
+  drawGrid();
+
+  for (int new_x = 0; new_x < display_width; new_x++) {
+    float value = amplitude * sin((frequency * M_PI / 180 * new_x) + phase);
+    new_y = (value * display_height + display_height) / 2;
+
+    new_y = min(max(new_y, 0), display_height - 1);
+
+    if (new_x == 0) {
+      display.drawPixel(new_x, new_y, WHITE);
+    } else {
+      display.drawLine(old_x, old_y, new_x, new_y, WHITE);
+    }
+
+    old_x = new_x;
+    old_y = new_y;
+  }
+  display.display(); //sends the buffer to the OLED
+}
+
+void drawSquareWave(float amplitude, float frequency, float phase) {
+  //  amplitude: vertical compression (1 = screen height)
+  //  frequency: horizontal compression (1 = screen width)
+  //  phase: horitontal shift (in degrees)
+
+  int old_x, old_y, new_y;
+  uint8_t vCenter = display_height / 2;
+
+  display.clearDisplay();
+  drawGrid();
+
+  for (int new_x = 0; new_x < display_width; new_x++) {
+    float value = amplitude * sin((frequency * M_PI / 180 * new_x) + phase);
+    value = ((value > 0) ? 1 : -1);
+
+    new_y = vCenter + (value * vCenter * amplitude);
+    new_y = min(max(new_y, 0), display_height - 1);
+
+    if (new_x == 0) {
+      display.drawPixel(new_x, new_y, WHITE);
+    } else {
+      display.drawLine(old_x, old_y, new_x, new_y, WHITE);
+    }
+
+    old_x = new_x;
+    old_y = new_y;
+  }
+  display.display(); //sends the buffer to the OLED
+}
+
+void animateRandomWaveform() {
   uint8_t vCenter = display_height / 2;
   display.clearDisplay();
 
@@ -140,7 +206,7 @@ void drawRandomWaveform() {
   }
 }
 
-void drawRandomGraph() {
+void animateRandomGraph() {
 
   uint8_t prev_x = 0;
   uint8_t prev_val = 0;
@@ -161,7 +227,7 @@ void drawRandomGraph() {
   }
 }
 
-void drawRandomText() {
+void animateRandomText() {
   uint8_t border = 3;
   display.clearDisplay();
   drawBorder();
@@ -185,8 +251,8 @@ void drawRotatedBitmap(uint8_t x, uint8_t y, const uint8_t *bitmap, uint8_t widt
   uint8_t pivot_x = width / 2;       // Calculate the (rotation) center of the image (x fraction)
   uint8_t pivot_y = height / 2;      // Calculate the (rotation) center of the image (y fraction)
   float angle_rad = angle / 57.3;
-  float sin_angle = sin(angle_rad); // Lookup the sinus
-  float cos_angle = cos(angle_rad); // Lookup the cosinus
+  float sin_angle = sin(angle_rad); // Lookup the Sine
+  float cos_angle = cos(angle_rad); // Lookup the coSine
   for (int row = 0; row < height; row++) {
     uint8_t displayData, mask = 0;
     for (int col = 0; col < width; col++) {
