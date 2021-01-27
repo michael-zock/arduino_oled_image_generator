@@ -45,27 +45,42 @@ void loop() {
   }
 
   display.clearDisplay();
-  for (int i = 0; i < 32; i++) {
-    drawHorizontalBarGauge(0, 0, display_width * .75, display_height, WHITE, WHITE, random(10, 90));
-    drawVerticalBarGauge(display_width * .8, 0, display_width * .2, display_height, WHITE, WHITE, random(10, 90));
-    delay(10);
+  for (int percentage = 0; percentage <= 100; percentage += 10) {
+    drawHorizontalBarGauge(0, 0, display_width * .75, display_height, WHITE, WHITE, percentage);
+    drawVerticalBarGauge(display_width * .8, 0, display_width * .2, display_height, WHITE, WHITE, percentage);
+    delay(50);
+  }
+  for (int percentage = 100; percentage > 0; percentage -= 10) {
+    drawHorizontalBarGauge(0, 0, display_width * .75, display_height, WHITE, WHITE, percentage);
+    drawVerticalBarGauge(display_width * .8, 0, display_width * .2, display_height, WHITE, WHITE, percentage);
+    delay(50);
+  }
+
+  display.clearDisplay();
+  for (int percentage = 0; percentage <= 100; percentage += 10) {
+    drawHorizontalTriangleGauge(0, 0, display_width * .75, display_height, WHITE, WHITE, percentage);
+    drawVerticalTriangleGauge(display_width * .8, 0, display_width * .2, display_height, WHITE, WHITE, percentage);
+    delay(50);
+  }
+  for (int percentage = 100; percentage > 0; percentage -= 10) {
+    drawHorizontalTriangleGauge(0, 0, display_width * .75, display_height, WHITE, WHITE, percentage);
+    drawVerticalTriangleGauge(display_width * .8, 0, display_width * .2, display_height, WHITE, WHITE, percentage);
+    delay(50);
   }
 
   display.clearDisplay();
   for (int i = 0; i < 25; i++) {
-    display.clearDisplay();
-    drawHorizontalTriangleGauge(0, 0, display_width * .75, display_height, WHITE, WHITE, random(10, 90));
-    drawVerticalTriangleGauge(display_width * .8, 0, display_width * .2, display_height, WHITE, WHITE, random(10, 90));
-  }
-
-  display.clearDisplay();
-  for (int i = 0; i < 25; i++) {
-    drawCircularGauge(display_width / 2 - display_height / 2, 0, display_height, display_height, 1, 0, random(10, 90), WHITE);
+    drawCircularGauge(display_width / 2 - display_height / 2, 0, display_height, display_height, 3, 0, random(10, 90), WHITE);
   }
 
   display.clearDisplay();
   for (int phase = 0; phase < 90; phase++) {
     drawSineWave(0.8, 5, phase);
+  }
+
+  display.clearDisplay();
+  for (int phase = 0; phase < 90; phase++) {
+    drawCompositeWave(2, 2, 0.5, 3, 0.1, 6, phase);
   }
 
   display.clearDisplay();
@@ -145,6 +160,38 @@ void drawSineWave(float amplitude, float frequency, float phase) {
 
   for (int new_x = 0; new_x < display_width; new_x++) {
     float value = amplitude * sin((frequency * M_PI / 180 * new_x) + phase);
+    new_y = (value * display_height + display_height) / 2;
+
+    new_y = min(max(new_y, 0), display_height - 1);
+
+    if (new_x == 0) {
+      display.drawPixel(new_x, new_y, WHITE);
+    } else {
+      display.drawLine(old_x, old_y, new_x, new_y, WHITE);
+    }
+
+    old_x = new_x;
+    old_y = new_y;
+  }
+  display.display(); //sends the buffer to the OLED
+}
+
+void drawCompositeWave(float amplitude1, float frequency1, float amplitude2, float frequency2, float amplitude3, float frequency3, float phase) {
+  //  amplitude: vertical compression (1 = screen height)
+  //  frequency: horizontal compression (1 = screen width)
+  //  phase: horitontal shift (in degrees)
+
+  int old_x, old_y, new_y;
+  uint8_t vCenter = display_height / 2;
+
+  display.clearDisplay();
+  drawGrid();
+
+  for (int new_x = 0; new_x < display_width; new_x++) {
+    float value1 = amplitude1 * sin((frequency1 * M_PI / 180 * new_x) + phase);
+    float value2 = amplitude2 * cos((frequency2 * M_PI / 180 * new_x) + phase);
+    float value3 = amplitude3 * tan((frequency3 * M_PI / 180 * new_x) + phase);
+    float value = value1 * value2 * value3;
     new_y = (value * display_height + display_height) / 2;
 
     new_y = min(max(new_y, 0), display_height - 1);
@@ -271,48 +318,47 @@ void drawRotatedBitmap(uint8_t x, uint8_t y, const uint8_t *bitmap, uint8_t widt
 }
 
 void drawHorizontalBarGauge(uint16_t x0, uint16_t y0, uint16_t width, uint16_t height, uint16_t color_frame, uint16_t color_fill, float percentage) {
-  uint16_t width_filled = map(percentage, 0, 100, 0, width);
-  display.fillRect(x0, y0, width, height, BLACK); // Reset the display area's background to black
-  display.fillRect(x0, y0, width_filled, height, color_fill);
+  uint16_t width_filled = map(percentage, 0, 100, 0, width - 2);
+  display.fillRect(x0, y0, width, height, BLACK); // Reset the display area's background
+  display.fillRect(x0 + 1, y0 + 1, width_filled, height - 2, color_fill);
   display.drawRect(x0, y0, width, height, color_frame);
   display.display(); //sends the buffer to the OLED
 }
 
 void drawVerticalBarGauge(uint16_t x0, uint16_t y0, uint16_t width, uint16_t height, uint16_t color_frame, uint16_t color_fill, float percentage) {
-  uint16_t height_filled = map(percentage, 0, 100, 0, height);
-  display.fillRect(x0, y0, width, height, BLACK); // Reset the display area's background to black
-  display.fillRect(x0, y0 + height - height_filled, width, height_filled, color_fill);
+  uint16_t height_filled = map(percentage, 0, 100, 2, height);
+  display.fillRect(x0, y0, width, height, BLACK); // Reset the display area's background
+  display.fillRect(x0 + 1, y0 + 1 + height - height_filled, width - 2, height_filled, color_fill);
   display.drawRect(x0, y0, width, height, color_frame);
   display.display(); //sends the buffer to the OLED
 }
 
 void drawHorizontalTriangleGauge(uint16_t x0, uint16_t y0, uint16_t width, uint16_t height, uint16_t color_frame, uint16_t color_fill, float percentage) {
-  uint16_t width_filled = map(percentage, 0, 100, 0, width),
+  uint16_t width_filled = map(percentage, 0, 100, 0, width - 2),
            x1 = x0,
            y1 = y0 + height - 1,
            x2 = x0 + width - 1,
            y2 = y1;
 
-  display.fillRect(x0, y0, width, height, BLACK); // Reset the display area's background to black
-  display.fillRect(x0, y0, width_filled, height, color_fill);
-  display.drawRect(x0, y0, width, height, color_frame);
-  display.fillTriangle(x0 + 1, y0, x2, y0, x2, y1 - 1, BLACK);
-  display.drawLine(x0, y0, x2, y2, color_frame);
+  display.fillRect(x0, y0, width, height, BLACK); // Reset the display area's background
+  display.fillRect(x0 + 1, y0, width_filled, height - 1, color_fill);
+  display.fillTriangle(x0, y0, x2, y0, x0, y1 - 1, BLACK);
+  display.drawTriangle(x0, y1, x2, y0, x2, y2, color_frame);
   display.display(); //sends the buffer to the OLED
 }
 
 void drawVerticalTriangleGauge(uint16_t x0, uint16_t y0, uint16_t width, uint16_t height, uint16_t color_frame, uint16_t color_fill, float percentage) {
-  uint16_t height_filled = map(percentage, 0, 100, 0, height),
+  uint16_t height_empty = map(percentage, 0, 100, height - 2, 0),
            x1 = x0,
            y1 = y0 + height - 1,
            x2 = x0 + width - 1,
            y2 = y1;
 
-  display.fillRect(x0, y0, width, height, BLACK); // Reset the display area's background to black
-  display.fillRect(x0, y0 + height - height_filled, width, height_filled, color_fill);
-  display.drawRect(x0, y0, width, height, color_frame);
-  display.fillTriangle(x0 + 1, y0, x2, y0, x2, y1 - 1, BLACK);
-  display.drawLine(x0, y0, x2, y2, color_frame);
+  display.fillRect(x0, y0, width, height, BLACK); // Reset the display area's background
+  display.fillTriangle(x0, y0, x2, y0, x0, y2, color_frame);
+  display.fillRect(x0 + 1, y0 + 1, width - 2, height_empty, BLACK);
+  display.drawTriangle(x0, y0, x2, y0, x0, y2, color_frame);
+  display.drawLine(x0, y2, x2, y0, color_frame);
   display.display(); //sends the buffer to the OLED
 }
 
@@ -333,7 +379,7 @@ void drawCircularGauge(uint16_t x, uint16_t y, uint16_t width, uint16_t height, 
   uint16_t x1 = start_x * radius_x + x_center;
   uint16_t y1 = start_y * radius_y + y_center;
 
-  display.fillRect(x, y, width, height, BLACK); // Reset the display area's background to black
+  display.fillRect(x, y, width, height, BLACK); // Reset the display area's background
 
   for (int current_angle = start_angle; current_angle < start_angle + seg_degrees * seg_count; current_angle += seg_degrees) {
     float start_x2 = cos((current_angle + 1 - 90) * DEG2RAD);
