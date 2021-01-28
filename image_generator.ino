@@ -85,6 +85,12 @@ void loop() {
 
   display.clearDisplay();
   for (int phase = 0; phase < 90; phase++) {
+    drawFakeHeartbeat(phase);
+    delay(50);
+  }
+
+  display.clearDisplay();
+  for (int phase = 0; phase < 90; phase++) {
     drawSquareWave(0.6, 10, phase);
   }
 }
@@ -194,6 +200,35 @@ void drawCompositeWave(float amplitude1, float frequency1, float amplitude2, flo
     float value = value1 * value2 * value3;
     new_y = (value * display_height + display_height) / 2;
 
+    new_y = min(max(new_y, 0), display_height - 1);
+
+    if (new_x == 0) {
+      display.drawPixel(new_x, new_y, WHITE);
+    } else {
+      display.drawLine(old_x, old_y, new_x, new_y, WHITE);
+    }
+
+    old_x = new_x;
+    old_y = new_y;
+  }
+  display.display(); //sends the buffer to the OLED
+}
+
+void drawFakeHeartbeat(float phase) {
+  //  phase: horitontal shift (in degrees)
+
+  int old_x, old_y, new_y;
+  uint8_t vCenter = display_height / 2;
+
+  display.clearDisplay();
+  //drawGrid();
+
+  for (int new_x = 0; new_x < display_width; new_x++) {
+    float value1 = pow(sin(new_x), 63) * 360;
+    float value2 = pow(sin(new_x + 1.5), 8) * 360;
+    float value = value1 * value2;
+
+    new_y = (value * display_height + display_height) / 2;
     new_y = min(max(new_y, 0), display_height - 1);
 
     if (new_x == 0) {
