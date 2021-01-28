@@ -35,6 +35,9 @@ void loop() {
   animateRandomWaveform();
   animateRandomGraph();
   animateRandomText();
+  drawVerticalRandomBarChart(0, 0, display_width / 2 - 1, display_height, 6, 2);
+  drawHorizontalRandomBarChart(display_width / 2 + 1, 0, display_width / 2, display_height, 4, 1);
+  delay(1000);
 
   for (uint16_t angle = 0; angle < 360; angle += 6) {
     display.clearDisplay();
@@ -433,5 +436,31 @@ void drawCircularGauge(uint16_t x, uint16_t y, uint16_t width, uint16_t height, 
     x1 = x3;
     y1 = y3;
   }
+  display.display(); //sends the buffer to the OLED
+}
+
+void drawVerticalRandomBarChart(uint16_t x0, uint16_t y0, uint16_t width, uint16_t height, uint16_t bar_width, uint16_t bar_spacing) {
+  display.fillRect(x0, y0, width, height, BLACK); // Reset the display area's background
+  display.drawLine(x0, y0, x0, y0 + height - 1, WHITE);
+  display.drawLine(x0, y0 + height - 1, x0 + width - 1, y0 + height - 1, WHITE);
+
+  for (int x1 = x0 + bar_spacing; x1 < width - bar_spacing; x1 += (bar_width + bar_spacing)) {
+    int bar_height = random(0, height);
+    display.fillRect(x1, x0 + height - bar_height, bar_width, bar_height, WHITE);
+  }
+
+  display.display(); //sends the buffer to the OLED
+}
+
+void drawHorizontalRandomBarChart(uint16_t x0, uint16_t y0, uint16_t width, uint16_t height, uint16_t bar_height, uint16_t bar_spacing) {
+  display.fillRect(x0, y0, width, height, BLACK); // Reset the display area's background
+  display.drawLine(x0, y0, x0, y0 + height - 1, WHITE);
+  display.drawLine(x0, y0 + height - 1, x0 + width - 1, y0 + height - 1, WHITE);
+
+  for (int y1 = (y0 + bar_spacing); y1 < (y0 + height); y1 += (bar_height + bar_spacing)) {
+    int bar_width = random(0, width);
+    display.fillRect(x0, y1, bar_width, bar_height, WHITE);
+  }
+
   display.display(); //sends the buffer to the OLED
 }
