@@ -141,10 +141,10 @@ void drawSquareGrid() {
   display.clearDisplay();
   drawBorder();
 
-  for (int x = 0; x <= display_width; x += grid_size) {
+  for (int x = grid_size; x <= display_width; x += grid_size) {
     display.drawLine(x, 0, x, display_height, WHITE);
   }
-  for (int y = 0; y <= display_height; y += grid_size) {
+  for (int y = grid_size; y <= display_height; y += grid_size) {
     display.drawLine(0, y, display_width, y, WHITE);
   }
   display.display();
