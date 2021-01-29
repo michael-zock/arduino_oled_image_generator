@@ -136,6 +136,20 @@ void drawGrid() {
   }
 }
 
+void drawSquareGrid() {
+  uint8_t grid_size = 8;
+  display.clearDisplay();
+  drawBorder();
+
+  for (int x = 0; x <= display_width; x += grid_size) {
+    display.drawLine(x, 0, x, display_height, WHITE);
+  }
+  for (int y = 0; y <= display_height; y += grid_size) {
+    display.drawLine(0, y, display_width, y, WHITE);
+  }
+  display.display();
+}
+
 void animateRandomWaves() {
   int old_x, old_cos, old_sin, new_cos, new_sin, vCenter = display_height / 2;
   uint8_t Radius = random(display_height / 16, display_height / 2);
