@@ -37,7 +37,7 @@ void loop() {
   animateRandomText();
 
   displayTargetGrid();
-  delay(1000);
+  delay(500);
 
   for (int phase = 0; phase < 90; phase++) {
     drawDNAHelix(phase);
