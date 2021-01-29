@@ -470,16 +470,19 @@ void drawHorizontalRandomBarChart(uint16_t x0, uint16_t y0, uint16_t width, uint
 }
 
 void displayTargetGrid() {
-  int x_center = display_width / 2, y_center = display_height / 2, step_size = 8, center_height = 0.4 * display_height, dot_radius = 3;
+  int x_center = display_width / 2, y_center = display_height / 2, step_size = 8, center_height = 0.4 * display_height, dot_radius = 2;
   display.fillScreen(BLACK);
   drawBorder();
   for (int x = 0; x <= display_width; x += step_size) {
-    for (int y = 0; y <= display_height; y += step_size) {
-      display.drawLine(x, y, x_center, y_center, WHITE);
-    }
+    display.drawLine(x, 0, x_center, y_center, WHITE);
+    display.drawLine(x, display_height, x_center, y_center, WHITE);
+  }
+  for (int y = 0; y <= display_height; y += step_size / 2) {
+    display.drawLine(0, y, x_center, y_center, WHITE);
+    display.drawLine(display_width, y, x_center, y_center, WHITE);
   }
   display.fillRect(0, y_center - (center_height / 2) - 1, display_width, center_height, WHITE);
   display.fillRect(0, y_center - (center_height / 2), display_width, center_height - 2, BLACK);
-  display.fillCircle(x_center - dot_radius / 2, y_center - dot_radius / 2, dot_radius, WHITE);
+  display.fillCircle(x_center, y_center, dot_radius, WHITE);
   display.display(); //sends the buffer to the OLED
 }
