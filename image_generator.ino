@@ -39,6 +39,11 @@ void loop() {
   displayTargetGrid();
   delay(1000);
 
+  for (int phase = 0; phase < 90; phase++) {
+    drawDNAHelix(phase);
+    delay(20);
+  }
+
   drawVerticalRandomBarChart(0, 0, display_width / 2 - 1, display_height, 6, 2);
   drawHorizontalRandomBarChart(display_width / 2 + 1, 0, display_width / 2, display_height, 4, 1);
   delay(1000);
@@ -484,5 +489,42 @@ void displayTargetGrid() {
   display.fillRect(0, y_center - (center_height / 2) - 1, display_width, center_height, WHITE);
   display.fillRect(0, y_center - (center_height / 2), display_width, center_height - 2, BLACK);
   display.fillCircle(x_center, y_center, dot_radius, WHITE);
+  display.display(); //sends the buffer to the OLED
+}
+
+void drawDNAHelix(float phase) {
+  //  amplitude: vertical compression (1 = screen height)
+  //  frequency: horizontal compression (1 = screen width)
+  //  phase: horitontal shift (in degrees)
+  float amplitude = 0.8, frequency = 4;
+  int old_x, old_y1, old_y2, new_y1, new_y2;
+  uint8_t vCenter = display_height / 2;
+
+  display.clearDisplay();
+  drawBorder();
+
+  for (int new_x = 0; new_x < display_width; new_x++) {
+    float value = amplitude * sin((frequency * M_PI / 180 * new_x) + phase);
+    new_y1 = (value * display_height + display_height) / 2;
+    new_y2 = (-1 * value * display_height + display_height) / 2;
+
+    new_y1 = min(max(new_y1, 0), display_height - 1);
+    new_y2 = min(max(new_y2, 0), display_height - 1);
+
+    if (new_x == 0) {
+      display.drawPixel(new_x, new_y1, WHITE);
+      display.drawPixel(new_x, new_y2, WHITE);
+    } else {
+      display.drawLine(old_x, old_y1, new_x, new_y1, WHITE);
+      display.drawLine(old_x, old_y2, new_x, new_y2, WHITE);
+    }
+    if ((new_x / 3 & 1)) {
+      display.drawLine(new_x, new_y1, new_x, new_y2, WHITE);
+    }
+
+    old_x = new_x;
+    old_y1 = new_y1;
+    old_y2 = new_y2;
+  }
   display.display(); //sends the buffer to the OLED
 }
