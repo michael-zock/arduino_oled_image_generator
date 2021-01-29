@@ -35,6 +35,10 @@ void loop() {
   animateRandomWaveform();
   animateRandomGraph();
   animateRandomText();
+
+  displayTargetGrid();
+  delay(1000);
+
   drawVerticalRandomBarChart(0, 0, display_width / 2 - 1, display_height, 6, 2);
   drawHorizontalRandomBarChart(display_width / 2 + 1, 0, display_width / 2, display_height, 4, 1);
   delay(1000);
@@ -462,5 +466,20 @@ void drawHorizontalRandomBarChart(uint16_t x0, uint16_t y0, uint16_t width, uint
     display.fillRect(x0, y1, bar_width, bar_height, WHITE);
   }
 
+  display.display(); //sends the buffer to the OLED
+}
+
+void displayTargetGrid() {
+  int x_center = display_width / 2, y_center = display_height / 2, step_size = 8, center_height = 0.4 * display_height, dot_radius = 3;
+  display.fillScreen(BLACK);
+  drawBorder();
+  for (int x = 0; x <= display_width; x += step_size) {
+    for (int y = 0; y <= display_height; y += step_size) {
+      display.drawLine(x, y, x_center, y_center, WHITE);
+    }
+  }
+  display.fillRect(0, y_center - (center_height / 2) - 1, display_width, center_height, WHITE);
+  display.fillRect(0, y_center - (center_height / 2), display_width, center_height - 2, BLACK);
+  display.fillCircle(x_center - dot_radius / 2, y_center - dot_radius / 2, dot_radius, WHITE);
   display.display(); //sends the buffer to the OLED
 }
