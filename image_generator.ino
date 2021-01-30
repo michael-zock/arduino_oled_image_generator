@@ -36,7 +36,9 @@ void loop() {
   animateRandomGraph();
   animateRandomText();
 
-  displayTargetGrid();
+  displayTargetGrid1();
+  delay(500);
+  displayTargetGrid2();
   delay(500);
 
   for (int phase = 0; phase < 90; phase++) {
@@ -488,7 +490,7 @@ void drawHorizontalRandomBarChart(uint16_t x0, uint16_t y0, uint16_t width, uint
   display.display(); //sends the buffer to the OLED
 }
 
-void displayTargetGrid() {
+void displayTargetGrid1() {
   int x_center = display_width / 2, y_center = display_height / 2, step_size = 8, center_height = 0.4 * display_height, dot_radius = 2;
   display.fillScreen(BLACK);
   drawBorder();
@@ -503,6 +505,26 @@ void displayTargetGrid() {
   display.fillRect(0, y_center - (center_height / 2) - 1, display_width, center_height, WHITE);
   display.fillRect(0, y_center - (center_height / 2), display_width, center_height - 2, BLACK);
   display.fillCircle(x_center, y_center, dot_radius, WHITE);
+  display.display(); //sends the buffer to the OLED
+}
+
+void displayTargetGrid2() {
+  int corner_size = display_height / 3, cross_offset = display_width / 4, label_height = display_height / 4, label_width = label_height * 3;
+  display.clearDisplay();
+
+  display.drawLine(0, corner_size, corner_size, 0, WHITE);
+  display.drawLine(0, display_height - corner_size, corner_size, display_height, WHITE);
+  display.drawLine(display_width - corner_size, 0, display_width, corner_size, WHITE);
+  display.drawLine(display_width - corner_size, display_height, display_width, display_height - corner_size, WHITE);
+  display.drawLine(corner_size, 0, display_width - corner_size, 0, WHITE);
+  display.drawLine(corner_size, display_height - 1, display_width - corner_size, display_height - 1, WHITE);
+  display.drawLine(0, corner_size, 0, display_height - corner_size, WHITE);
+  display.drawLine(display_width - 1, corner_size, display_width - 1, display_height - corner_size, WHITE);
+  display.drawLine(cross_offset, 0, display_width - cross_offset, display_height - 1, WHITE);
+  display.drawLine(cross_offset, display_height - 1, display_width - cross_offset, 0, WHITE);
+  display.fillRect(0, (display_height / 2) - (label_height / 2), label_width, label_height, WHITE);
+  display.fillRect(display_width - label_width, (display_height / 2) - (label_height / 2), label_width, label_height, WHITE);
+
   display.display(); //sends the buffer to the OLED
 }
 
