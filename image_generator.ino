@@ -107,6 +107,11 @@ void loop() {
   for (int phase = 0; phase < 90; phase++) {
     drawSquareWave(0.6, 10, phase);
   }
+
+  display.clearDisplay();
+  for (uint16_t orientation = 0; orientation < 360; orientation += 10) {
+    drawHorizontalCompass(0, 0, display_width, display_height, WHITE, orientation);
+  }
 }
 
 void drawWhiteNoise() {
@@ -562,5 +567,54 @@ void drawDNAHelix(float phase) {
     old_y1 = new_y1;
     old_y2 = new_y2;
   }
+  display.display(); //sends the buffer to the OLED
+}
+
+void drawHorizontalCompass(uint16_t x0, uint16_t y0, uint16_t width, uint16_t height, uint16_t color, uint16_t orientation) {
+  int border_size = 4,
+      element_width = width - 2 / border_size,
+      element_height = height - 2 * border_size,
+      x_center = x0 + width / 2,
+      y_bottom = y0 + height - border_size,
+      i = 0;
+
+  display.fillRect(x0, y0, width, height, BLACK); // Reset the display area's background                                   //Indicator
+
+  for (int offset = (element_width / 2) * (-1); offset <= (element_width / 2); offset++) {
+    int current_orientation = orientation + offset;
+    int current_orientation_clean = current_orientation % 360;
+    int current_x = x_center + offset;
+    if (current_orientation_clean % 90 == 0) {
+      display.drawLine(current_x, y_bottom - 12, current_x, y_bottom, color);
+      if (i > x0 + 4 * border_size && i < x0 + element_width - 2 * border_size) {
+        char label;
+        switch (current_orientation) {
+        case 0:
+          label = 'N';
+          break;
+        case 90:
+          label = 'E';
+          break;
+        case 180:
+          label = 'S';
+          break;
+        case 270:
+          label = 'W';
+          break;
+        }
+        display.drawChar(current_x - 4, y_bottom - 24, label, color, BLACK, 2);
+      }
+    } else if (current_orientation_clean % 45 == 0) {
+      display.drawLine(current_x, y_bottom - 12, current_x, y_bottom, color);
+    } else if (current_orientation_clean % 15 == 0) {
+      display.drawLine(current_x, y_bottom - 6, current_x, y_bottom, color);
+    }
+    i++;
+  }
+
+  display.drawRect(x0, y0, width, height, color);
+  display.drawLine(x0 + border_size, y0 + height - border_size, x0 + border_size + element_width, y0 + height - border_size, color); //Base line
+  display.fillTriangle(x_center, y0 + border_size, x_center - 4, y_bottom, x_center + 4, y_bottom, color);                           //Indicator
+
   display.display(); //sends the buffer to the OLED
 }
